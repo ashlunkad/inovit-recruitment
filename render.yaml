@@ -1,0 +1,40 @@
+services:
+  # Backend API
+  - type: web
+    name: inovit-api
+    runtime: node
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URL
+        value: https://inovit-app.onrender.com
+      - key: WATI_API_URL
+        sync: false
+      - key: WATI_API_TOKEN
+        sync: false
+
+  # Frontend
+  - type: web
+    name: inovit-app
+    runtime: static
+    region: singapore
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://inovit-api.onrender.com/api/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
